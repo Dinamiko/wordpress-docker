@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  wordpress:
+    build:
+      context: .
+      args:
+        - WORDPRESS_IMAGE=${WORDPRESS_IMAGE}
+        - WORDPRESS_TAG=${WORDPRESS_TAG}
+        - XDEBUG_REMOTE_HOST=${XDEBUG_REMOTE_HOST}
+    image: wordpress-docker:latest
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    volumes:
+      - ./wordpress-data:/var/www/html
+    depends_on:
+      - mysql
+  mysql:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - mysql-data:/var/lib/mysql
+  phpmyadmin:
+    image: nazarpc/phpmyadmin
+    links:
+      - mysql:mysql
+    ports:
+      - 1234:80
+volumes:
+  wordpress: {}
+  mysql-data: {}
